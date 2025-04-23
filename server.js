@@ -3,6 +3,8 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
+const filePath = path.join(__dirname, 'codes.txt');
+
 
 const app = express();
 const PORT = 3000;
@@ -45,7 +47,16 @@ app.post('/store-code', (req, res) => {
     return res.status(400).json({ error: 'No code received' });
   }
 
-  const filePath = path.join(__dirname, 'codes.txt');
+  // Create the file if it doesn't exist and append the code
+  fs.appendFile(filePath, `${new Date().toISOString()} - ${code}\n`, (err) => {
+    if (err) {
+      console.error('Error writing code:', err);
+      return res.status(500).json({ error: 'Failed to save code' });
+    }
+    console.log('Code saved:', code);
+    res.json({ status: 'success' });
+  });
+});
   const timestamp = new Date().toISOString();
   const entry = `${timestamp} - Code: ${code}\n`;
 
@@ -57,7 +68,6 @@ app.post('/store-code', (req, res) => {
     console.log('Code saved:', code);
     res.status(200).json({ status: 'success' });
   });
-});
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
